@@ -1,6 +1,8 @@
 pipeline {
     agent any
-    
+    environment {
+        DOCKERHUB_CRED = credentials('dockerhubcred')
+    }
     stages {
         stage('Cleanup') {
             steps {
@@ -24,6 +26,17 @@ pipeline {
                 sh 'docker run -d  --name mysql  --network task2webhooknetwork --mount type=volume,source=task2volumewebhook,target=/var/lib/mysql trio-task-mysql:5.7'
                 sh 'docker run -d --name flask-app --network task2webhooknetwork trio-task-flask-app:latest'
                 sh 'docker run -d --name nginx -p 80:80 --network task2webhooknetwork --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf nginx:latest'
+            }
+        }
+         stage('push'){
+            steps{
+                sh "echo \$DOCKERHUB_CRED_PSW | docker login -u \$DOCKERHUB_CRED_USR --password-stdin"
+                sh "docker tag mysql joshhillvivedia/mysql1:latest"
+                sh "docker tag flask-app joshhillvivedia/flask-app1:latest"
+                sh "docker tag nginx joshhillvivedia/nginx1:latest"
+                sh "docker push joshhillvivedia/mysql1:latest"
+                sh "docker push joshhillvivedia/flask-app1:latest"
+                sh "docker push joshhillvivedia/newmynginx1:latest"
             }
         }
 
