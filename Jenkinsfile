@@ -23,7 +23,7 @@ pipeline {
             steps {
                 sh 'docker run -d  --name mysql  --network task2webhooknetwork --mount type=volume,source=task2volumewebhook,target=/var/lib/mysql trio-task-mysql:5.7'
                 sh 'docker run -d --name flask-app --network task2webhooknetwork trio-task-flask-app:latest'
-                sh 'docker run -d --name nginx -p 80:80 --network lab9network --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf nginx:latest'
+                sh 'docker run -d --name nginx -p 80:80 --network task2webhooknetwork --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf nginx:latest'
             }
         }
 
